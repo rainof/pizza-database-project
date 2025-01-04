@@ -1,0 +1,23 @@
+{
+  "name": "pizza-database-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "knexfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rainof/pizza-database-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rainof/pizza-database-project/issues"
+  },
+  "homepage": "https://github.com/rainof/pizza-database-project#readme",
+  "dependencies": {
+    "knex": "^3.1.0",
+    "pg": "^8.13.1"
+  }
+}
