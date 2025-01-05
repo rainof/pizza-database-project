@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "localpostgres",
+            "group": "local",
+            "database": "pizza_database",
+            "username": "fon_admin",
+            "password": "1q2w3e4r"
+        }
+    ]
+}
