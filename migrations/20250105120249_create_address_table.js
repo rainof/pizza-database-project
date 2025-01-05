@@ -4,7 +4,7 @@
  */
 exports.up = function (knex) {
   return knex.schema.createTable("address", (table) => {
-    table.increments("addr_id").primary();
+    table.uuid("addr_id").primary();
     table.string("addr_1").notNullable();
     table.string("addr_2").nullable();
     table.string("city").notNullable();

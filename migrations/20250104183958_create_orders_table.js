@@ -2,7 +2,7 @@
 
 exports.up = function (knex) {
   return knex.schema.createTable("orders", (table) => {
-    table.increments("row_id").primary();
+    table.uuid("row_id").primary();
     table.string("order_id", 10).notNullable();
     table.timestamp("created_at").notNullable();
     table.string("item_id", 10).notNullable();
