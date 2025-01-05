@@ -6,17 +6,13 @@ exports.up = function (knex) {
     table.string("order_id", 10).notNullable();
     table.timestamp("created_at").notNullable();
     table.string("item_id", 10).notNullable();
-    table.integer("quantity").notNullable();
-    table.string("cust_firstname", 50).notNullable();
-    table.string("cust_lastname", 50).notNullable();
+    table.integer("quantity", 10).notNullable();
+    table.string("cust_id", 10).notNullable();
     table.boolean("delivery").notNullable();
-    table.string("delivery_address1", 200).notNullable();
-    table.string("delivery_address2", 200).notNullable();
-    table.string("delivery_city", 50).notNullable();
-    table.string("delivery_zipcode", 20).notNullable();
+    table.string("addr_id", 10).notNullable();
   });
 };
 
 exports.down = function (knex) {
-  return;
+  return knex.schema.dropTableIfExists("orders");
 };
