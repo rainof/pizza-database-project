@@ -10,8 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
 
-// Endpoint to fetch all orders with detailed information,
-// including item details, customer info, and address.
+// Fetch all orders with item, customer, and address details
 app.get("/orders", async (req, res) => {
   try {
     const orders = await db("orders")
@@ -42,8 +41,7 @@ app.get("/orders", async (req, res) => {
   }
 });
 
-// Endpoint to fetch a single order's detailed information based on the order ID,
-// including item details, customer info, and address.
+// Fetch single order details by ID
 app.get("/orders/:orderId", async (req, res) => {
   const { orderId } = req.params;
 
@@ -77,7 +75,7 @@ app.get("/orders/:orderId", async (req, res) => {
   }
 });
 
-//
+// Add a new order
 app.post("/orders", async (req, res) => {
   const { order_id, item_id, quantity, cust_id, delivery, addr_id } = req.body;
 
@@ -102,6 +100,35 @@ app.post("/orders", async (req, res) => {
     });
 
     res.status(201).json({ message: "Order added successfully." });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Update an existing order by ID
+app.put("/orders/:orderId", async (req, res) => {
+  const { orderId } = req.params;
+  const { quantity, delivery, addr_id } = req.body;
+
+  try {
+    const existingOrder = await db("orders").where("order_id", orderId).first();
+    if (!existingOrder) {
+      return res.status(404).json({ error: "Order not found." });
+    }
+
+    const updates = {};
+    if (quantity != undefined) updates.quantity = quantity;
+    if (delivery != undefined) updates.delivery = delivery;
+    if (addr_id != undefined) updates.addr_id = addr_id;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: "No valid fields to update." });
+    }
+
+    await db("orders").where("order_id", orderId).update(updates);
+
+    res.status(200).json({ message: "Order updated successfully." });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
