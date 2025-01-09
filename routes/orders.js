@@ -190,4 +190,58 @@ router.get("/delivery/:status", async (req, res) => {
   }
 });
 
+// Fetch orders by date time
+router.get("/orders/date-range", async (req, res) => {
+  const { startDate, endDate } = req.query;
+  if (!startDate || !endDate) {
+    return res
+      .status(400)
+      .json({ error: "Both startDate and endDate are required." });
+  }
+
+  try {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start > end) {
+      return res
+        .status(400)
+        .json({ error: "startDate must be before endDate." });
+    }
+
+    const orders = await db("orders")
+      .join("items", "orders.item_id", "items.item_id")
+      .join("customers", "orders.cust_id", "customers.cust_id")
+      .join("addresses", "orders.addr_id", "addresses.addr_id")
+      .select(
+        "orders.order_id",
+        "orders.created_at",
+        "orders.quantity",
+        "orders.delivery",
+        "items.item_name",
+        "items.item_category",
+        "items.item_size",
+        "items.item_price",
+        "customers.firstname",
+        "customers.lastname",
+        "addresses.addr_1",
+        "addresses.addr_2",
+        "addresses.city",
+        "addresses.zipcode"
+      )
+      .whereBetween("orders.created_at", [start, end]);
+
+    if (orders.length === 0) {
+      return res.status(404).json({
+        message: `No orders found in the range between \'${startDate}\' and \'${endDate}\'`,
+      });
+    }
+
+    res.json(orders);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
