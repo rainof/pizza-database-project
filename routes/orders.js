@@ -149,4 +149,45 @@ router.delete("/:orderId", async (req, res) => {
   }
 });
 
+// Fetch orders by delivery status
+router.get("/delivery/:status", async (req, res) => {
+  const { status } = req.params;
+  const deliveryStatus = status === "true";
+
+  try {
+    const orders = await db("orders")
+      .join("items", "orders.item_id", "items.item_id")
+      .join("customers", "orders.cust_id", "customers.cust_id")
+      .join("addresses", "orders.addr_id", "addresses.addr_id")
+      .select(
+        "orders.order_id",
+        "orders.created_at",
+        "orders.quantity",
+        "orders.delivery",
+        "items.item_name",
+        "items.item_category",
+        "items.item_size",
+        "items.item_price",
+        "customers.firstname",
+        "customers.lastname",
+        "addresses.addr_1",
+        "addresses.addr_2",
+        "addresses.city",
+        "addresses.zipcode"
+      )
+      .where("orders.delivery", deliveryStatus);
+
+    if (orders.length === 0) {
+      return res
+        .status(404)
+        .json({ message: `No orders found with \'${status}\' status` });
+    }
+
+    res.json(orders);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
