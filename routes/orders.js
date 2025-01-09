@@ -202,6 +202,7 @@ router.get("/orders/date-range", async (req, res) => {
   try {
     const start = new Date(startDate);
     const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
 
     if (start > end) {
       return res
