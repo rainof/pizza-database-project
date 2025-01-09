@@ -1,17 +1,11 @@
 const express = require("express");
-const db = require("./db");
 const { v4: uuidv4 } = require("uuid");
-require("dotenv").config();
-const cors = require("cors");
+const db = require("../src/db");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(express.json());
-app.use(cors());
+const router = express.Router();
 
 // Fetch all orders with item, customer, and address details
-app.get("/orders", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const orders = await db("orders")
       .join("items", "orders.item_id", "items.item_id")
@@ -42,7 +36,7 @@ app.get("/orders", async (req, res) => {
 });
 
 // Fetch single order details by ID
-app.get("/orders/:orderId", async (req, res) => {
+router.get("/:orderId", async (req, res) => {
   const { orderId } = req.params;
 
   try {
@@ -76,7 +70,7 @@ app.get("/orders/:orderId", async (req, res) => {
 });
 
 // Add a new order
-app.post("/orders", async (req, res) => {
+router.post("/", async (req, res) => {
   const { order_id, item_id, quantity, cust_id, delivery, addr_id } = req.body;
 
   try {
@@ -107,7 +101,7 @@ app.post("/orders", async (req, res) => {
 });
 
 // Update an existing order by ID
-app.put("/orders/:orderId", async (req, res) => {
+router.put("/:orderId", async (req, res) => {
   const { orderId } = req.params;
   const { quantity, delivery, addr_id } = req.body;
 
@@ -135,6 +129,4 @@ app.put("/orders/:orderId", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+module.exports = router;
