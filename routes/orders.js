@@ -129,4 +129,24 @@ router.put("/:orderId", async (req, res) => {
   }
 });
 
+// Delete an order by ID
+router.delete("/:orderId", async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const existingOrder = await db("orders").where("order_id", orderId).first();
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: "Order not found." });
+    }
+
+    await db("orders").where("order_id", orderId).del();
+
+    res.status(200).json({ message: "Order deleted successfully." });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
