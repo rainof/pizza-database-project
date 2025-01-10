@@ -1,4 +1,5 @@
 const express = require("express");
+const { v4: uuidv4 } = require("uuid");
 const db = require("../src/db");
 
 const router = express.Router();
@@ -28,8 +29,10 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "All fields are required." });
     }
 
+    const item_id = uuidv4();
+
     const newItem = {
-      item_id: require("uuid").v4(),
+      item_id,
       item_name,
       item_category,
       item_size,

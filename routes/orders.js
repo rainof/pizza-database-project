@@ -82,7 +82,7 @@ router.post("/", async (req, res) => {
 
     const created_at = new Date();
 
-    await db("orders").insert({
+    const newOrder = {
       row_id,
       order_id,
       created_at,
@@ -91,9 +91,13 @@ router.post("/", async (req, res) => {
       cust_id,
       delivery,
       addr_id,
-    });
+    };
 
-    res.status(201).json({ message: "Order added successfully." });
+    await db("orders").insert(newOrder);
+
+    res
+      .status(201)
+      .json({ message: "Order added successfully.", order: newOrder });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
