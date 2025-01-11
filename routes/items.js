@@ -138,4 +138,24 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Delete an item by ID
+router.delete("/:itemId", async (req, res) => {
+  const { itemId } = req.params;
+
+  try {
+    const existingItem = await db("items").where("item_id", itemId).first();
+
+    if (!existingItem) {
+      return res.status(404).json({ error: "Item not found." });
+    }
+
+    await db("items").where("item_id", itemId).del();
+
+    res.status(200).json({ message: "Item deleted successfully." });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
