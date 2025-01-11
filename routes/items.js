@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Fetch orders by item names
+// Fetch items by name
 router.get("/items/menu", async (req, res) => {
   const { name } = req.query;
   if (!name) {
@@ -52,6 +52,49 @@ router.get("/items/menu", async (req, res) => {
           order: "asc",
         },
         { column: "item_category", order: "asc" },
+      ]);
+
+    if (items.length === 0) {
+      return res.status(404).json({ message: "No items found." });
+    }
+
+    res.json(items);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Fetch items by category
+router.get("/items/category", async (req, res) => {
+  const { name } = req.query;
+  if (!name) {
+    return req.status(400).json({ error: "name is required." });
+  }
+  try {
+    const items = await db("items")
+      .select(
+        "item_id",
+        "item_name",
+        "item_category",
+        "item_size",
+        "item_price"
+      )
+      .where("items.item_category", "ilike", `%${name}%`)
+      .orderBy([
+        { column: "item_category", order: "asc" },
+        { column: "item_name", order: "asc" },
+        {
+          column: db.raw(
+            `CASE
+            WHEN LOWER(item_size) = 'large' THEN 1
+            WHEN LOWER(item_size) = 'medium' THEN 2
+            WHEN LOWER(item_size) = 'small' THEN 3
+            ELSE 4
+          END`
+          ),
+          order: "asc",
+        },
       ]);
 
     if (items.length === 0) {
