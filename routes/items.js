@@ -4,6 +4,7 @@ const db = require("../src/db");
 
 const router = express.Router();
 
+// Fetch all items
 router.get("/", async (req, res) => {
   try {
     const items = await db("items").select(
@@ -21,6 +22,35 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Fetch orders by item names
+router.get("/items/menu", async (req, res) => {
+  const { name } = req.query;
+  if (!name) {
+    return req.status(400).json({ error: "name is required." });
+  }
+  try {
+    const items = await db("items")
+      .select(
+        "item_id",
+        "item_name",
+        "item_category",
+        "item_size",
+        "item_price"
+      )
+      .where("items.item_name", name);
+
+    if (items.length === 0) {
+      return res.status(404).json({ message: "No items found." });
+    }
+
+    res.json(items);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Create new item
 router.post("/", async (req, res) => {
   const { item_name, item_category, item_size, item_price } = req.body;
 
