@@ -37,7 +37,22 @@ router.get("/items/menu", async (req, res) => {
         "item_size",
         "item_price"
       )
-      .where("items.item_name", name);
+      .where("items.item_name", "ilike", `%${name}%`)
+      .orderBy([
+        { column: "item_name", order: "asc" },
+        {
+          column: db.raw(
+            `CASE
+            WHEN LOWER(item_size) = 'large' THEN 1
+            WHEN LOWER(item_size) = 'medium' THEN 2
+            WHEN LOWER(item_size) = 'small' THEN 3
+            ELSE 4
+          END`
+          ),
+          order: "asc",
+        },
+        { column: "item_category", order: "asc" },
+      ]);
 
     if (items.length === 0) {
       return res.status(404).json({ message: "No items found." });
