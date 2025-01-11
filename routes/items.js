@@ -7,13 +7,29 @@ const router = express.Router();
 // Fetch all items
 router.get("/", async (req, res) => {
   try {
-    const items = await db("items").select(
-      "item_id",
-      "item_name",
-      "item_category",
-      "item_size",
-      "item_price"
-    );
+    const items = await db("items")
+      .select(
+        "item_id",
+        "item_name",
+        "item_category",
+        "item_size",
+        "item_price"
+      )
+      .orderBy([
+        { column: "item_category", order: "asc" },
+        { column: "item_name", order: "asc" },
+        {
+          column: db.raw(
+            `CASE
+          WHEN LOWER(item_size) = 'large' THEN 1
+          WHEN LOWER(item_size) = 'medium' THEN 2
+          WHEN LOWER(item_size) = 'small' THEN 3
+          ELSE 4
+        END`
+          ),
+          order: "asc",
+        },
+      ]);
 
     res.status(200).json(items);
   } catch (error) {
