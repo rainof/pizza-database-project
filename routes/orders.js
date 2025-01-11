@@ -28,6 +28,10 @@ router.get("/", async (req, res) => {
         "addresses.zipcode"
       );
 
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "No orders found" });
+    }
+
     res.json(orders);
   } catch (err) {
     console.error(err.message);
@@ -40,7 +44,7 @@ router.get("/:orderId", async (req, res) => {
   const { orderId } = req.params;
 
   try {
-    const order = await db("orders")
+    const orders = await db("orders")
       .join("items", "orders.item_id", "items.item_id")
       .join("customers", "orders.cust_id", "customers.cust_id")
       .join("addresses", "orders.addr_id", "addresses.addr_id")
@@ -62,7 +66,11 @@ router.get("/:orderId", async (req, res) => {
       )
       .where("orders.order_id", orderId);
 
-    res.json(order);
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "No orders found" });
+    }
+
+    res.json(orders);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
