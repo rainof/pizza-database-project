@@ -21,4 +21,35 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Create new customer
+router.post("/", async (req, res) => {
+  const { firstname, lastname } = req.body;
+
+  try {
+    if (!firstname || !lastname) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const cust_id = uuidv4();
+
+    const newCustomer = {
+      cust_id,
+      firstname,
+      lastname,
+    };
+
+    await db("customers").insert(newCustomer);
+
+    res
+      .status(201)
+      .json({
+        message: "Customer created successfully.",
+        customer: newCustomer,
+      });
+  } catch (error) {
+    console.error("Error creating customer:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 module.exports = router;
