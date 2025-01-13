@@ -8,7 +8,17 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const customers = await db("customers")
-      .select("cust_id", "firstname", "lastname")
+      .join("addresses", "customers.addr_id", "addresses.addr_id")
+      .select(
+        "customers.cust_id",
+        "customers.firstname",
+        "customers.lastname",
+        "addresses.addr_id",
+        "addresses.addr_1",
+        "addresses.addr_2",
+        "addresses.city",
+        "addresses.zipcode"
+      )
       .orderBy([
         { column: "firstname", order: "asc" },
         { column: "lastname", order: "asc" },
@@ -16,7 +26,7 @@ router.get("/", async (req, res) => {
 
     res.status(200).json(customers);
   } catch (error) {
-    console.error(err.message);
+    console.error(error.message);
     res.status(500).json({ message: "Server Error" });
   }
 });
