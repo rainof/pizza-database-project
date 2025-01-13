@@ -7,6 +7,7 @@ exports.up = function (knex) {
     table.uuid("cust_id").primary();
     table.string("firstname", 50).notNullable();
     table.string("lastname", 50).notNullable();
+    table.string("addr_id", 10).notNullable();
   });
 };
 

@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     const orders = await db("orders")
       .join("items", "orders.item_id", "items.item_id")
       .join("customers", "orders.cust_id", "customers.cust_id")
-      .join("addresses", "orders.addr_id", "addresses.addr_id")
+      .join("addresses", "customers.addr_id", "addresses.addr_id")
       .select(
         "orders.order_id",
         "orders.created_at",
@@ -47,7 +47,7 @@ router.get("/:orderId", async (req, res) => {
     const orders = await db("orders")
       .join("items", "orders.item_id", "items.item_id")
       .join("customers", "orders.cust_id", "customers.cust_id")
-      .join("addresses", "orders.addr_id", "addresses.addr_id")
+      .join("addresses", "customers.addr_id", "addresses.addr_id")
       .select(
         "orders.order_id",
         "orders.created_at",
@@ -170,7 +170,7 @@ router.get("/delivery/:status", async (req, res) => {
     const orders = await db("orders")
       .join("items", "orders.item_id", "items.item_id")
       .join("customers", "orders.cust_id", "customers.cust_id")
-      .join("addresses", "orders.addr_id", "addresses.addr_id")
+      .join("addresses", "customers.addr_id", "addresses.addr_id")
       .select(
         "orders.order_id",
         "orders.created_at",
@@ -225,7 +225,7 @@ router.get("/orders/date-range", async (req, res) => {
     const orders = await db("orders")
       .join("items", "orders.item_id", "items.item_id")
       .join("customers", "orders.cust_id", "customers.cust_id")
-      .join("addresses", "orders.addr_id", "addresses.addr_id")
+      .join("addresses", "customers.addr_id", "addresses.addr_id")
       .select(
         "orders.order_id",
         "orders.created_at",

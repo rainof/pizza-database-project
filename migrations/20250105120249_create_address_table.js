@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable("address", (table) => {
+  return knex.schema.createTable("addresses", (table) => {
     table.uuid("addr_id").primary();
     table.string("addr_1").notNullable();
     table.string("addr_2").nullable();
@@ -17,5 +17,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTableIfExists("address");
+  return knex.schema.dropTableIfExists("addresses");
 };

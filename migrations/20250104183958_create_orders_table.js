@@ -9,7 +9,6 @@ exports.up = function (knex) {
     table.integer("quantity", 10).notNullable();
     table.string("cust_id", 10).notNullable();
     table.boolean("delivery").notNullable();
-    table.string("addr_id", 10).notNullable();
   });
 };
 

@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require("uuid");
  */
 exports.seed = async function (knex) {
   // Deletes ALL existing entries
-  await knex("address").del();
+  await knex("addresses").del();
   await knex("customers").del();
   await knex("items").del();
   await knex("orders").del();
@@ -24,7 +24,7 @@ exports.seed = async function (knex) {
   const sodaCokeId = uuidv4();
 
   // Insert mock data into tables
-  await knex("address").insert([
+  await knex("addresses").insert([
     {
       addr_id: addr1Id,
       addr_1: "12 Pizza Lane",
@@ -42,8 +42,18 @@ exports.seed = async function (knex) {
   ]);
 
   await knex("customers").insert([
-    { cust_id: cust1Id, firstname: "Mario", lastname: "Rossi" },
-    { cust_id: cust2Id, firstname: "Luigi", lastname: "Verdi" },
+    {
+      cust_id: cust1Id,
+      firstname: "Mario",
+      lastname: "Rossi",
+      addr_id: addr1Id,
+    },
+    {
+      cust_id: cust2Id,
+      firstname: "Luigi",
+      lastname: "Verdi",
+      addr_id: addr2Id,
+    },
   ]);
 
   await knex("items").insert([
@@ -86,7 +96,6 @@ exports.seed = async function (knex) {
       quantity: 1,
       cust_id: cust1Id,
       delivery: true,
-      addr_id: addr1Id,
     },
     {
       row_id: uuidv4(),
@@ -96,7 +105,6 @@ exports.seed = async function (knex) {
       quantity: 2,
       cust_id: cust2Id,
       delivery: true,
-      addr_id: addr2Id,
     },
     {
       row_id: uuidv4(),
@@ -106,7 +114,6 @@ exports.seed = async function (knex) {
       quantity: 3,
       cust_id: cust1Id,
       delivery: false,
-      addr_id: addr1Id,
     },
     {
       row_id: uuidv4(),
@@ -116,7 +123,6 @@ exports.seed = async function (knex) {
       quantity: 4,
       cust_id: cust2Id,
       delivery: false,
-      addr_id: addr2Id,
     },
   ]);
 };
