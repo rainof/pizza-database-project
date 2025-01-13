@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Create new customer
+// Create a new customer
 router.post("/", async (req, res) => {
   const { firstname, lastname } = req.body;
 
@@ -40,15 +40,33 @@ router.post("/", async (req, res) => {
 
     await db("customers").insert(newCustomer);
 
-    res
-      .status(201)
-      .json({
-        message: "Customer created successfully.",
-        customer: newCustomer,
-      });
+    res.status(201).json({
+      message: "Customer created successfully.",
+      customer: newCustomer,
+    });
   } catch (error) {
     console.error("Error creating customer:", error);
     res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// Delete a customer by ID
+router.delete("/:custId", async (req, res) => {
+  const { custId } = req.params;
+
+  try {
+    const existingCust = await db("customers").where("cust_id", custId).first();
+
+    if (!existingCust) {
+      return res.status(404).json({ error: "Customer not found." });
+    }
+
+    await db("customers").where("cust_id", custId).del();
+
+    res.status(200).json({ message: "Customer deleted successfully." });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
   }
 });
 
