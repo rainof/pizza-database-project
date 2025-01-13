@@ -21,16 +21,17 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Create a new customer
+// Create a new customer with their address
 router.post("/", async (req, res) => {
-  const { firstname, lastname } = req.body;
+  const { firstname, lastname, addr_1, addr_2, city, zipcode } = req.body;
 
   try {
-    if (!firstname || !lastname) {
+    if (!firstname || !lastname || !addr_1 || !addr_2 || !city || !zipcode) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
     const cust_id = uuidv4();
+    const addr_id = uuidv4();
 
     const newCustomer = {
       cust_id,
@@ -38,14 +39,26 @@ router.post("/", async (req, res) => {
       lastname,
     };
 
-    await db("customers").insert(newCustomer);
+    const newAddress = {
+      addr_id,
+      addr_1,
+      addr_2: addr_2 || null,
+      city,
+      zipcode,
+    };
+
+    await db.transaction(async (trx) => {
+      await db("customers").insert(newCustomer);
+      await db("addresses").insert(newAddress);
+    });
 
     res.status(201).json({
       message: "Customer created successfully.",
       customer: newCustomer,
+      address: newAddress,
     });
   } catch (error) {
-    console.error("Error creating customer:", error);
+    console.error("Error creating customer and address:", error);
     res.status(500).json({ message: "Server Error" });
   }
 });
