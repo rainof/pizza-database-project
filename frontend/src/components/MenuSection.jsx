@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const MenuSection = () => {
-  const menuItems = [
-    { name: 'PIZZA 01', price: '$10' },
-    { name: 'PIZZA 02', price: '$12' },
-    { name: 'PIZZA 03', price: '$11' },
-  ];
+  const [menuItems, setMenuItems] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/items')
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Fetched menu data:", data);
+        setMenuItems(data);
+      })
+      .catch((error) => console.error('Error fetching menu:', error));
+  }, []);
 
   return (
     <section className="py-8 px-4 bg-gray-100">
@@ -13,11 +19,13 @@ const MenuSection = () => {
       <ul className="space-y-4">
         {menuItems.map((item, index) => (
           <li
-            key={index}
+            key={item.item_id}
             className="flex justify-between items-center p-4 bg-white rounded-md shadow-md"
           >
-            <span className="text-gray-800">{item.name}</span>
-            <span className="text-orange-500 font-semibold">{item.price}</span>
+            <span className="text-gray-800">
+              {item.item_name} ({item.item_size})
+            </span>
+            <span className="text-orange-500 font-semibold">${item.item_price}</span>
           </li>
         ))}
       </ul>
