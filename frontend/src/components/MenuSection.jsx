@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const MenuSection = () => {
   const [menuItems, setMenuItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("");
 
   // Fetch all items on mount
@@ -11,6 +12,14 @@ const MenuSection = () => {
       .then((data) => setMenuItems(data))
       .catch((error) => console.error("Error fetching menu:", error));
   }, []);
+
+  // Handle Search
+  const handleSearch = () => {
+    fetch(`http://localhost:3000/items/items/menu?name=${searchQuery}`)
+      .then((response) => response.json())
+      .then((data) => setMenuItems(data))
+      .catch((error) => console.error("Error fetching menu:", error));
+  };
 
   // Handle Category Filter
   const handleCategoryChange = (categoryName) => {
@@ -42,6 +51,19 @@ const MenuSection = () => {
 
   return (
     <section className="p-6 bg-gray-100">
+      {/* Search Bar */}
+      <div className="flex justify-center space-x-4 mb-6">
+        <input
+          type="text"
+          placeholder="Search for an item..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="px-4 py-2 border rounded-md"
+        />
+        <button onClick={handleSearch} className="px-4 py-2 bg-orange-500 text-white rounded-md">
+          Search
+        </button>
+      </div>
 
       {/* Category Filter */}
       <div className="flex justify-center space-x-4 mb-6">
