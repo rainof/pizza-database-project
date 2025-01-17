@@ -2,33 +2,72 @@ import React, { useState, useEffect } from 'react';
 
 const MenuSection = () => {
   const [menuItems, setMenuItems] = useState([]);
+  const [category, setCategory] = useState("");
 
+  // Fetch all items on mount
   useEffect(() => {
-    fetch('http://localhost:3000/items')
+    fetch("http://localhost:3000/items")
       .then((response) => response.json())
-      .then((data) => {
-        console.log("Fetched menu data:", data);
-        setMenuItems(data);
-      })
-      .catch((error) => console.error('Error fetching menu:', error));
+      .then((data) => setMenuItems(data))
+      .catch((error) => console.error("Error fetching menu:", error));
   }, []);
 
+  // Handle Category Filter
+  const handleCategoryChange = (categoryName) => {
+    setCategory(categoryName);
+    console.log("Selected category:", categoryName);
+
+    const url = categoryName === "All"
+      ? "http://localhost:3000/items"
+      : `http://localhost:3000/items/items/category?name=${categoryName}`;
+
+    fetch(url)
+      .then((response) => {
+        console.log("Raw Response:", response);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Fetched Data:", data);
+        setMenuItems(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching menu:", error);
+      });
+  };
+
   return (
-    <section className="py-8 px-4 bg-gray-100">
-      <h2 className="text-center text-2xl font-bold text-gray-800 mb-4">Our Menu</h2>
-      <ul className="space-y-4">
-        {menuItems.map((item, index) => (
-          <li
-            key={item.item_id}
-            className="flex justify-between items-center p-4 bg-white rounded-md shadow-md"
+    <section className="p-6 bg-gray-100">
+
+      {/* Category Filter */}
+      <div className="flex justify-center space-x-4 mb-6">
+        {["All", "Pizza", "Drink", "Side"].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => handleCategoryChange(cat)}
+            className={`px-4 py-2 rounded-md ${
+              category === cat ? "bg-blue-500 text-white" : "bg-gray-200"
+            }`}
           >
-            <span className="text-gray-800">
-              {item.item_name} ({item.item_size})
-            </span>
-            <span className="text-orange-500 font-semibold">${item.item_price}</span>
-          </li>
+            {cat}
+          </button>
         ))}
-      </ul>
+      </div>
+
+      {/* Menu Items */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {menuItems.map((item) => (
+          <div key={item.item_id} className="p-4 bg-white rounded-md shadow-md">
+            <h2 className="text-xl font-bold text-gray-800">{item.item_name}</h2>
+            <p className="text-gray-500">{item.item_category} - {item.item_size}</p>
+            <p className="text-orange-500 font-semibold">${item.item_price}</p>
+          </div>
+        ))}
+      </div>
     </section>
   );
 };
