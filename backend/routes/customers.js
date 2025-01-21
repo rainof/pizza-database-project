@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
         "customers.cust_id",
         "customers.firstname",
         "customers.lastname",
+        "customers.email",
         "addresses.addr_id",
         "addresses.addr_1",
         "addresses.addr_2",
