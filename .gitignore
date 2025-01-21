@@ -26,4 +26,4 @@ yarn-debug.log*
 yarn-error.log*
 
 backend/localpostgres.session.sql
-backend/.vscode
+.vscode
