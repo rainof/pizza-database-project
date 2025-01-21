@@ -1,8 +1,11 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const db = require("../src/db");
 
 const router = express.Router();
+const SECRET_KEY = "your_secret_key";
 
 // Fetch all customers
 router.get("/", async (req, res) => {
@@ -32,15 +35,38 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Create a new customer with their address
-router.post("/", async (req, res) => {
-  const { firstname, lastname, addr_1, addr_2, city, zipcode } = req.body;
+// Register a new customer
+router.post("/register", async (req, res) => {
+  const {
+    firstname,
+    lastname,
+    email,
+    password,
+    addr_1,
+    addr_2,
+    city,
+    zipcode,
+  } = req.body;
+
+  if (
+    !firstname ||
+    !lastname ||
+    !email ||
+    !password ||
+    !addr_1 ||
+    !city ||
+    !zipcode
+  ) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
   try {
-    if (!firstname || !lastname || !addr_1 || !addr_2 || !city || !zipcode) {
-      return res.status(400).json({ message: "All fields are required." });
+    const existingUser = await db("customers").where({ email }).first();
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already in use" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     const cust_id = uuidv4();
     const addr_id = uuidv4();
 
@@ -48,6 +74,9 @@ router.post("/", async (req, res) => {
       cust_id,
       firstname,
       lastname,
+      email,
+      password: hashedPassword,
+      addr_id,
     };
 
     const newAddress = {
@@ -59,17 +88,22 @@ router.post("/", async (req, res) => {
     };
 
     await db.transaction(async (trx) => {
-      await db("customers").insert(newCustomer);
-      await db("addresses").insert(newAddress);
+      await trx("addresses").insert(newAddress);
+      await trx("customers").insert(newCustomer);
+    });
+
+    const token = jwt.sign({ id: cust_id, email }, SECRET_KEY, {
+      expiresIn: "1h",
     });
 
     res.status(201).json({
-      message: "Customer created successfully.",
+      message: "User registered successfully",
+      token,
       customer: newCustomer,
       address: newAddress,
     });
   } catch (error) {
-    console.error("Error creating customer and address:", error);
+    console.error("Error registering user:", error);
     res.status(500).json({ message: "Server Error" });
   }
 });
